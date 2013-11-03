@@ -27,7 +27,7 @@ public class GraphDBEmbedded {
 	private static final String DB_PATH= "target/graph-network";
 	private GraphDatabaseService graphDb;
 	private long SDNNodeId;
-	private HashMap<String, Node> listPortDevices;
+	private HashMap<String, Node> listPortDevices = new HashMap<String, Node>();
 	
 	//LIST OF RELATION TYPES
 	private static enum RelTypes implements RelationshipType{
@@ -65,12 +65,13 @@ public class GraphDBEmbedded {
 				Node sw = CreateNodeDevices(Integer.toString(i), "sw",5);
 				//Define network-->element relationship
 				network.createRelationshipTo(sw, RelTypes.ELEMENT);
-				numports = (int) sw.getProperty("ports");
+				numports = (Integer) sw.getProperty("ports");
 				for(int j=0; j<numports; j++){
 					Node port = CreateNodePorts("sw" + Integer.toString(i) + "_p" + Integer.toString(j));
-					listPortDevices.put((String) port.getProperty("id"), port);
 					//Define sw-->port relationship;
 					CreateRelDevToPorts(sw, port);
+					//Added DevicePort to HashMap
+					listPortDevices.put((String) port.getProperty("id"), port);
 				}
 			}
 			
@@ -78,10 +79,15 @@ public class GraphDBEmbedded {
 			for(int i=0; i<4;i++){
 				Node pc = CreateNodeDevices(Integer.toString(i), "pc", 1);
 				Node port = CreateNodePorts("pc" + Integer.toString(i)+ "_p0");
+				//Define pc-->port relationship
 				CreateRelDevToPorts(pc, port);
+				//Added DevicePort to HashMap
+				listPortDevices.put((String) port.getProperty("id"), port);
 			}
 			
 			//CREATE LINKS**********
+			System.out.println("*************" + listPortDevices.keySet());
+			
 			CreateLinks(listPortDevices.get("pc0_p0"),listPortDevices.get("sw0_p0"));
 			CreateLinks(listPortDevices.get("pc1_p0"),listPortDevices.get("sw0_p1"));
 			CreateLinks(listPortDevices.get("sw0_p2"),listPortDevices.get("sw1_p0"));
@@ -137,8 +143,8 @@ public class GraphDBEmbedded {
 		Relationship link = port1.createRelationshipTo(port2, RelTypes.LINK);
 		link.setProperty("id", (String) port1.getProperty("id") + "-"+ (String) port2.getProperty("id"));
 		
-		int iface1 = (int) port1.getProperty("ethernet");
-		int iface2 = (int) port2.getProperty("ethernet");
+		int iface1 = (Integer) port1.getProperty("ethernet");
+		int iface2 = (Integer) port2.getProperty("ethernet");
 		int bandwidth;
 		
 		if (iface1>iface2) bandwidth = iface2;
