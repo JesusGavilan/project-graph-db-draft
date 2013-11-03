@@ -21,13 +21,13 @@ import org.neo4j.kernel.Traversal;
 public class GraphDBEmbedded {
 
 	//For Linux
-	//private static final String DB_PATH ="/path";
+	//private static final String DB_PATH ="/var/lib/neo4j/data/graph.db";
 	//For Windows
 	//private static final String DB_PATH ="/path";
 	private static final String DB_PATH= "target/graph-network";
 	private GraphDatabaseService graphDb;
 	private long SDNNodeId;
-	private HashMap<String, Node> listPortDevices = new HashMap<String, Node>();
+	private HashMap<String, Node> listIfaceDevices = new HashMap<String, Node>();
 	
 	//LIST OF RELATION TYPES
 	private static enum RelTypes implements RelationshipType{
@@ -57,46 +57,46 @@ public class GraphDBEmbedded {
 			Node network = graphDb.createNode();
 			network.setProperty("name", "SDNnetwork");
 			SDNNodeId = network.getId();
-			int numports;
+			int numIfaces;
 			
 			//Create switch and ports nodes
 			for(int i=0;i<4;i++){
 			
-				Node sw = CreateNodeDevices(Integer.toString(i), "sw",5);
+				Node sw = CreateNodeDevices(Integer.toString(i), "SW",5);
 				//Define network-->element relationship
 				network.createRelationshipTo(sw, RelTypes.ELEMENT);
-				numports = (Integer) sw.getProperty("ports");
-				for(int j=0; j<numports; j++){
-					Node port = CreateNodePorts("sw" + Integer.toString(i) + "_p" + Integer.toString(j));
+				numIfaces = (Integer) sw.getProperty("interfaces");
+				for(int j=0; j<numIfaces; j++){
+					Node iface = CreateNodeIfaces("SW-" + Integer.toString(i) + "_P" + Integer.toString(j), "SW");
 					//Define sw-->port relationship;
-					CreateRelDevToPorts(sw, port);
+					CreateRelDevToIfaces(sw, iface);
 					//Added DevicePort to HashMap
-					listPortDevices.put((String) port.getProperty("id"), port);
+					listIfaceDevices.put((String) iface.getProperty("inventoryId"), iface);
 				}
 			}
 			
 			//Create pc nodes
 			for(int i=0; i<4;i++){
-				Node pc = CreateNodeDevices(Integer.toString(i), "pc", 1);
-				Node port = CreateNodePorts("pc" + Integer.toString(i)+ "_p0");
+				Node pc = CreateNodeDevices(Integer.toString(i), "PC", 1);
+				Node iface = CreateNodeIfaces("PC-" + Integer.toString(i)+ "_P0","PC");
 				//Define pc-->port relationship
-				CreateRelDevToPorts(pc, port);
+				CreateRelDevToIfaces(pc, iface);
 				//Added DevicePort to HashMap
-				listPortDevices.put((String) port.getProperty("id"), port);
+				listIfaceDevices.put((String) iface.getProperty("inventoryId"), iface);
 			}
 			
 			//CREATE LINKS**********
-			System.out.println("*************" + listPortDevices.keySet());
+			System.out.println("*************" + listIfaceDevices.keySet());
 			
-			CreateLinks(listPortDevices.get("pc0_p0"),listPortDevices.get("sw0_p0"));
-			CreateLinks(listPortDevices.get("pc1_p0"),listPortDevices.get("sw0_p1"));
-			CreateLinks(listPortDevices.get("sw0_p2"),listPortDevices.get("sw1_p0"));
-			CreateLinks(listPortDevices.get("sw0_p3"),listPortDevices.get("sw2_p0"));
-			CreateLinks(listPortDevices.get("sw1_p1"),listPortDevices.get("sw2_p1"));
-			CreateLinks(listPortDevices.get("sw1_p2"),listPortDevices.get("sw3_p0"));
-			CreateLinks(listPortDevices.get("sw2_p2"),listPortDevices.get("sw3_p1"));
-			CreateLinks(listPortDevices.get("sw3_p2"),listPortDevices.get("pc2_p0"));
-			CreateLinks(listPortDevices.get("sw3_p3"),listPortDevices.get("pc3_p0"));			
+			CreateLinks(listIfaceDevices.get("PC-0_P0"),listIfaceDevices.get("SW-0_P0"));
+			CreateLinks(listIfaceDevices.get("PC-1_P0"),listIfaceDevices.get("SW-0_P1"));
+			CreateLinks(listIfaceDevices.get("SW-0_P2"),listIfaceDevices.get("SW-1_P0"));
+			CreateLinks(listIfaceDevices.get("SW-0_P3"),listIfaceDevices.get("SW-2_P0"));
+			CreateLinks(listIfaceDevices.get("SW-1_P1"),listIfaceDevices.get("SW-2_P1"));
+			CreateLinks(listIfaceDevices.get("SW-1_P2"),listIfaceDevices.get("SW-3_P0"));
+			CreateLinks(listIfaceDevices.get("SW-2_P2"),listIfaceDevices.get("SW-3_P1"));
+			CreateLinks(listIfaceDevices.get("SW-3_P2"),listIfaceDevices.get("PC-2_P0"));
+			CreateLinks(listIfaceDevices.get("SW-3_P3"),listIfaceDevices.get("PC-3_P0"));			
 			
 			tx.success();	
 		}
@@ -115,40 +115,41 @@ public class GraphDBEmbedded {
 	public Node CreateNodeDevices( String name, String type, int ports){
 		//id---> sw0,pc0,....
 		Node device = graphDb.createNode();
-		device.setProperty("id", type + name);
+		device.setProperty("inventoryId", type + "-" + name);
 		device.setProperty("status", true);
 		device.setProperty("type", type );
-		device.setProperty("ports", ports);
-		if(type=="sw" || type=="rt")	device.setProperty("model", "RouterBOARD 750GL");
+		device.setProperty("interfaces", ports);
+		if(type=="SW" || type=="RT")	device.setProperty("model", "RouterBOARD 750GL");
 		else device.setProperty("model", "PC");
 		return device;
 	}
 	
-	public Node CreateNodePorts(String name){
+	public Node CreateNodeIfaces(String name, String type){
 		//id---> sw0_p0, pc0_p1....
-		Node port = graphDb.createNode();
-		port.setProperty("id", name );
-		port.setProperty("status", true);
-		port.setProperty("behaviour", "port");
-		port.setProperty("ethernet", 100);//10/100/1000 Mbps
-		return port;
+		Node iface = graphDb.createNode();
+		iface.setProperty("inventoryId", name );
+		iface.setProperty("status", true);
+		iface.setProperty("mac", "00:34:22:33:33:69");
+		if(type=="RT" || type=="PC") iface.setProperty("ip", "66.66.66.66");
+		iface.setProperty("ethernet", 100);//10/100/1000 Mbps
+		return iface;
 	}
 	
-	public void CreateRelDevToPorts(Node sw, Node port){
-		Relationship DevToPort = sw.createRelationshipTo(port, RelTypes.HAS);
+	public void CreateRelDevToIfaces(Node sw, Node iface){
+		sw.createRelationshipTo(iface, RelTypes.HAS);
 		
 	}
 	
-	public void CreateLinks(Node port1, Node port2){
-		Relationship link = port1.createRelationshipTo(port2, RelTypes.LINK);
-		link.setProperty("id", (String) port1.getProperty("id") + "-"+ (String) port2.getProperty("id"));
+	public void CreateLinks(Node interface1, Node interface2){
+		Relationship link = interface1.createRelationshipTo(interface2, RelTypes.LINK);
+		link.setProperty("id", (String) interface1.getProperty("inventoryId") + "-"+ (String) interface2.getProperty("inventoryId"));
 		
-		int iface1 = (Integer) port1.getProperty("ethernet");
-		int iface2 = (Integer) port2.getProperty("ethernet");
+		int capacity1 = (Integer) interface1.getProperty("ethernet");
+		int capacity2 = (Integer) interface2.getProperty("ethernet");
 		int bandwidth;
 		
-		if (iface1>iface2) bandwidth = iface2;
-		else bandwidth = iface1;
+		if (capacity1>capacity2) bandwidth = capacity2;
+		else bandwidth = capacity1;
 		link.setProperty("BW", bandwidth);
 		link.setProperty("status", true);
 		
@@ -170,7 +171,7 @@ public class GraphDBEmbedded {
 			
 			for (Path elementPath : elementsTraverser){
 				output +="Ath depth " + elementPath.length() + " =>"
-									+ elementPath.endNode().getProperty("id") + "\n";
+									+ elementPath.endNode().getProperty("inventoryId") + "\n";
 				numberOfElements++;
 			}
 			output += "Number of elements found: " + numberOfElements + "\n";
