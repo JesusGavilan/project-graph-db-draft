@@ -24,44 +24,65 @@ public class SingletonNode {
 		return instance;
 	}
 	
-	public void execCommand(Command command){
+	public void execCommand(String cmd, Command comando){
+		
+		//Deserealizing and converting to object Command		
+		Command command = jsonToCommand(cmd,comando);
+		
+		
 		
 		ControllerImp action = new ControllerImp();
 		switch(command.getEvent()){
 			case "ADD_SWITCH":
-				jsonToSwitch(command.getObject(), command.getSwitch());
-				action.addSwitch(command.getSwitch());
+				//Deserializing and converting to Switch object
+				Switch sw = jsonToSwitch(command.getObject(), command.getSwitch);
+				//Executing add Switch
+				action.addSwitch(sw);
 				break;
 			
 			case "DELETE_SWITCH":
-				jsonToSwitch(command.getObject(), command.getSwitch());
-				action.deleteHost(command.getHost());
+				//Getting Switch Id 
+				String swId = command.getObject();
+				//Executing delete Switch
+				action.deleteSwitch();
 				break;
 			
 			case "UPDATE_SWITCH":
-				jsonToSwitch(command.getObject(), command.getSwitch());
-				action.updateHost(command.getHost());
+				/***** TO-DO *********/
+				//jsonToSwitch(command.getObject(), command.getSwitch());
+				//action.updateHost(command.getHost());
 				break;
 			
 			case "ADD_HOST":
-				jsonToHost(command.getObject(), command.getHost());
-				action.addHost(command.getHost());
+				//Deserealizing and converting to Host object
+				Host host = jsonToHost(command.getObject(), command.getHost());
+				//Executing add Host
+				action.addHost(host);
 				break;
 			
 			case "UPDATE_HOST":
-				jsonToHost(command.getObject(), command.getHost());
+				/******* TO-DO *****************/
+				//jsonToHost(command.getObject(), command.getHost());
 				break;
 			
 			case "DELETE_HOST":
-				jsonToHost(command.getObject(), command.getHost());
+				//Deserealizing and converting to Host object
+				Host host = jsonToHost(command.getObject(), command.getHost());
+				//Executing delete host
+				action.deleteHost(host);
 				break;
 			
 			case "ADD_LINK":
-				jsonToLink(command.getObject(), command.getLink());
+				//Deserealizing and converting to Link object
+				Link lnk = jsonToLink(command.getObject(), command.getLink());
+				//Executing add link
+				action.addLink(lnk)
 				break;
 				
 			case "DELETE_LINK":
-				jsonToLink(command.getObject(), command.getLink());
+				//Deseralizing and converting to Link object
+				Link lnk = jsonToLink(Command.getObject(), command.getLink());	
+				action.deleteLink(lnk);
 				break;
 				
 			case "UPDATE_LINK":
