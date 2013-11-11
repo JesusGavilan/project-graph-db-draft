@@ -35,7 +35,7 @@ public class SingletonNode {
 		switch(command.getEvent()){
 			case "ADD_SWITCH":
 				//Deserializing and converting to Switch object
-				Switch sw = jsonToSwitch(command.getObject(), command.getSwitch);
+				Switch sw = jsonToSwitch(command.getObject(), command.getSwitch());
 				//Executing add Switch
 				action.addSwitch(sw);
 				break;
@@ -44,7 +44,7 @@ public class SingletonNode {
 				//Getting Switch Id 
 				String swId = command.getObject();
 				//Executing delete Switch
-				action.deleteSwitch();
+				action.deleteSwitch(swId);
 				break;
 			
 			case "UPDATE_SWITCH":
@@ -67,22 +67,22 @@ public class SingletonNode {
 			
 			case "DELETE_HOST":
 				//Deserealizing and converting to Host object
-				Host host = jsonToHost(command.getObject(), command.getHost());
+				Host host1 = jsonToHost(command.getObject(), command.getHost());
 				//Executing delete host
-				action.deleteHost(host);
+				action.deleteHost(host1);
 				break;
 			
 			case "ADD_LINK":
 				//Deserealizing and converting to Link object
 				Link lnk = jsonToLink(command.getObject(), command.getLink());
 				//Executing add link
-				action.addLink(lnk)
+				action.addLink(lnk);
 				break;
 				
 			case "DELETE_LINK":
 				//Deseralizing and converting to Link object
-				Link lnk = jsonToLink(Command.getObject(), command.getLink());	
-				action.deleteLink(lnk);
+				Link lnk1 = jsonToLink(command.getObject(), command.getLink());	
+				action.deleteLink(lnk1);
 				break;
 				
 			case "UPDATE_LINK":

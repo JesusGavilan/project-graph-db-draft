@@ -16,7 +16,7 @@ public class testing {
 			Interface iface = new Interface();
 			iface.setInventoryId("SW-0:" + i);
 			iface.setMac("00:1e:68:bf:81:0"+ i);
-			iface.setPortId(0);
+			iface.setPortId(i);
 			iface.setCurrentSpeed(100);
 			iface.setEnabled(true);
 			ifaceCollection0.addInterface(iface);
@@ -26,7 +26,7 @@ public class testing {
 			Interface iface1 = new Interface();
 			iface1.setInventoryId("SW-1:" + i);
 			iface1.setMac("00:1e:68:bf:81:1"+ i);
-			iface1.setPortId(0);
+			iface1.setPortId(i);
 			iface1.setCurrentSpeed(100);
 			iface1.setEnabled(true);
 			ifaceCollection1.addInterface(iface1);		
@@ -83,7 +83,7 @@ public class testing {
 		
 		SingletonNode singleton = SingletonNode.getInstance();
 		//Executing command add sw0
-		singleton.execCommand(cmd0);
+		singleton.execCommand("Here comes ", cmd0);
 		
 		//Executing command add sw1
 		//singleton.execCommand(cmd1);

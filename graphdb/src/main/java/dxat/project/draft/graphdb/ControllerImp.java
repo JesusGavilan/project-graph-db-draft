@@ -71,12 +71,14 @@ public class ControllerImp implements ControllerInterface {
 				//Create the device --> controller relationship
 				
 				Node nodeIface;
-				
-				if (Integer.parseInt(ifaceConfigParameters[0])==iface.getPortId()) {
+				System.out.println("********** Creando ifaces " + Integer.valueOf(ifaceConfigParameters[0])+ "  " + iface.getPortId());
+				if (Integer.valueOf(ifaceConfigParameters[0])==iface.getPortId()) {
+		          
 					nodeIface = createNodeInterface(iface, device.getType(), device.getOfAddr());
 					
 				}
 				else {
+					
 					nodeIface = createNodeInterface(iface, device.getType(), null);
 				}
 				
@@ -132,7 +134,7 @@ public class ControllerImp implements ControllerInterface {
 			//Deleting interface to Controller
 			String idCT= "CT-" + sw.getProperty("inventoryId") + ":" + sw.getProperty("portConfig");
 
-			Traverser elementsTraverserController = getInterfaceController(getControllerNode());
+			Traverser elementsTraverserController = getInterfaceController(root);
 			for(Path elementController: elementsTraverserController){
 				if(elementController.endNode().getProperty("inventoryId")==idCT){
 					//Deleting interface controller-->controller relationship
@@ -416,42 +418,48 @@ public class ControllerImp implements ControllerInterface {
 	
 	private Node getControllerNode()
 	{
-		if (listIfaceDevices.get("inventoryId", "SDNController").getSingle()!=null)
-			return listIfaceDevices.get("inventoryId", "SDNcontroller").getSingle();
-		else{
-				Transaction tx = graphDb.beginTx();
-				try
-				{				
-				
-					//Create base network node
-					Node network = graphDb.createNode();
-					network.setProperty("name", "SDNnetwork");
-					network.setProperty("inventoryId", "SDNnetwork");
-					listIfaceDevices.add(network, "inventoryId", "SDNnetwork");
-					//SDNNodeId = network.getId();
-				
-					//Create controller node
-					Node controller = graphDb.createNode();
-					controller.setProperty("inventoryId", "SDNcontroller");
-					listIfaceDevices.add(controller, "inventoryId", "SDNcontroller");
-				
-					//Network-controller relationship
-					network.createRelationshipTo(controller, RelTypes.ELEMENT);
-					
-					
-					tx.success();	
-					
-					return controller;
-
-				}
-			finally
-				{
-					tx.finish();;	
-				}
+		if (listIfaceDevices.get("inventoryId", "SDNController").getSingle()==null){
+			//System.out.println("*********** Creando el controlador *********" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
+			Transaction tx = graphDb.beginTx();
 			
+			try
+			{				
+			
+				//Create base network node
+				Node network = graphDb.createNode();
+				network.setProperty("name", "SDNnetwork");
+				network.setProperty("inventoryId", "SDNnetwork");
+				listIfaceDevices.add(network, "inventoryId", "SDNnetwork");
+				//SDNNodeId = network.getId();
+			
+				//Create controller node
+				Node controller = graphDb.createNode();
+				controller.setProperty("inventoryId", "SDNcontroller");
+				listIfaceDevices.add(controller, "inventoryId", "SDNcontroller");
+			
+				//Network-controller relationship
+				network.createRelationshipTo(controller, RelTypes.ELEMENT);
+				
+				
+				tx.success();	
+				
+				return controller;
+
 			}
+			finally
+			{
+				tx.finish();;	
+			}
+		}
 		
+		else{
+			System.out.println("************** Existe el controlador ****************" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
+			return listIfaceDevices.get("inventoryId", "SDNcontroller").getSingle();	
+		}
+			
+			
 	}
+	
 	
 	public Node createNodeInterface(Interface interf, String type, String confIface ){
 		
@@ -471,7 +479,7 @@ public class ControllerImp implements ControllerInterface {
 			Node controllerIface = createInterfaceController("CT-" +  interf.getInventoryId());
 			
 			//Creating the controller -->  controllerIface relationship
-			getControllerNode().createRelationshipTo(controllerIface, RelTypes.HAS);
+			root.createRelationshipTo(controllerIface, RelTypes.HAS);
 			
 			//Creating LINK interface switch --> controllerIface relationship
 			iface.createRelationshipTo(controllerIface, RelTypes.LINK);
