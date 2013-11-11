@@ -11,3 +11,6 @@ org.neo4j.server.database.location= path
 Being path, place where you define at programm, in my case:
 /home/jesus/github/project-graph-db-draft/graphdb/target/graph-network
 
+In order to avoid permission problems:
+  
+  chmod -R 777 graph-network
