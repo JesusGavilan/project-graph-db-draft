@@ -73,11 +73,11 @@ public class ControllerImp implements ControllerInterface {
 				Node nodeIface;
 				
 				if (Integer.parseInt(ifaceConfigParameters[0])==iface.getPortId()) {
-					nodeIface = createNodeInterface(graphDb, iface, device.getType(), device.getOfAddr());
+					nodeIface = createNodeInterface(iface, device.getType(), device.getOfAddr());
 					
 				}
 				else {
-					nodeIface = createNodeInterface(graphDb,iface, device.getType(), null);
+					nodeIface = createNodeInterface(iface, device.getType(), null);
 				}
 				
 				//creating the switch --> switch interface relationship
@@ -453,7 +453,7 @@ public class ControllerImp implements ControllerInterface {
 		
 	}
 	
-	public Node createNodeInterface(GraphDatabaseService graphDb, Interface interf, String type, String confIface ){
+	public Node createNodeInterface(Interface interf, String type, String confIface ){
 		
 		Node iface = graphDb.createNode();
 		iface.setProperty("inventoryId", interf.getInventoryId());
