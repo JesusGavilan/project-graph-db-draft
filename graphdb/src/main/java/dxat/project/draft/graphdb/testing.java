@@ -175,46 +175,46 @@ public class testing {
 		//Creatin LINK SW-0_SW-1
 		Link lnk1 = new Link();
 		lnk1.setSrcSwitch("SW-0");
-		lnk1.setSrcPort(1);
+		lnk1.setSrcPort(3);
 		lnk1.setDstSwitch("SW-1");
 		lnk1.setDstPort(1);
-		lnk1.setInventoryId("SW-0:1_SW-1:1");
+		lnk1.setInventoryId("SW-0:3_SW-1:1");
 		lnk1.setType("");
 
 		//Creatin LINK SW-0_SW-2
 		Link lnk2 = new Link();
 		lnk2.setSrcSwitch("SW-0");
-		lnk2.setSrcPort(1);
+		lnk2.setSrcPort(4);
 		lnk2.setDstSwitch("SW-2");
 		lnk2.setDstPort(1);
-		lnk2.setInventoryId("SW-0:1_SW-1:1");
+		lnk2.setInventoryId("SW-0:4_SW-1:1");
 		lnk2.setType("");
 
 		//Creatin LINK SW-1_SW-2
 		Link lnk3 = new Link();
-		lnk3.setSrcSwitch("SW-0");
-		lnk3.setSrcPort(1);
-		lnk3.setDstSwitch("SW-1");
-		lnk3.setDstPort(1);
-		lnk3.setInventoryId("SW-0:1_SW-1:1");
+		lnk3.setSrcSwitch("SW-1");
+		lnk3.setSrcPort(4);
+		lnk3.setDstSwitch("SW-2");
+		lnk3.setDstPort(2);
+		lnk3.setInventoryId("SW-1:4_SW-2:2");
 		lnk3.setType("");
 
 		//Creatin LINK SW-1_SW-3
 		Link lnk4 = new Link();
-		lnk4.setSrcSwitch("SW-0");
-		lnk4.setSrcPort(1);
-		lnk4.setDstSwitch("SW-1");
+		lnk4.setSrcSwitch("SW-1");
+		lnk4.setSrcPort(3);
+		lnk4.setDstSwitch("SW-3");
 		lnk4.setDstPort(1);
-		lnk4.setInventoryId("SW-0:1_SW-1:1");
+		lnk4.setInventoryId("SW-1:3_SW-3:1");
 		lnk4.setType("");
 
 		//Creatin LINK SW-2_SW-3
 		Link lnk5 = new Link();
-		lnk5.setSrcSwitch("SW-0");
-		lnk5.setSrcPort(1);
-		lnk5.setDstSwitch("SW-1");
-		lnk5.setDstPort(1);
-		lnk5.setInventoryId("SW-0:1_SW-1:1");
+		lnk5.setSrcSwitch("SW-2");
+		lnk5.setSrcPort(4);
+		lnk5.setDstSwitch("SW-3");
+		lnk5.setDstPort(2);
+		lnk5.setInventoryId("SW-2:4_SW-3:2");
 		lnk5.setType("");
 		
 		//Creating command --> add sw0
@@ -281,15 +281,45 @@ public class testing {
 		cmd8.setSource("LINK");
 		cmd8.setLink(lnk5);
 		
+		//Creating command --> add HOST pc0
+		Command cmd9 = new Command();
+		cmd9.setEvent("ADD_HOST");
+		cmd9.setObject("here comes object serialized");
+		cmd9.setSource("HOST");
+		cmd9.setHost(pc0);
+		
+		//Creating command --> add HOST pc1
+		Command cmd10 = new Command();
+		cmd10.setEvent("ADD_HOST");
+		cmd10.setObject("here comes object serialized");
+		cmd10.setSource("HOST");
+		cmd10.setHost(pc1);
+				
+		//Creating command --> add HOST pc2
+		Command cmd11 = new Command();
+		cmd11.setEvent("ADD_HOST");
+		cmd11.setObject("here comes object serialized");
+		cmd11.setSource("HOST");
+		cmd11.setHost(pc2);
+
+		//Creating command --> add HOST pc0
+		Command cmd12 = new Command();
+		cmd12.setEvent("ADD_HOST");
+		cmd12.setObject("here comes object serialized");
+		cmd12.setSource("HOST");
+		cmd12.setHost(pc3);
+		
 		SingletonNode singleton = SingletonNode.getInstance();
+		
 		//Executing command add sw0
 		singleton.execCommand("Here comes ", cmd0);
 		System.out.println("Creando sw: " + cmd0.getSwitch().getInventoryId());
 		
+	
 		//Executing command add sw1
 		singleton.execCommand("Here comes ", cmd1);
 		System.out.println("Creando sw: " + cmd1.getSwitch().getInventoryId());
-	
+		
 		//Executing command add sw2
 		singleton.execCommand("Here comes", cmd2);
 		System.out.println("Creando sw: " + cmd2.getSwitch().getInventoryId());
@@ -297,10 +327,12 @@ public class testing {
 		//Executing command add sw3
 		singleton.execCommand("Here comes", cmd3);
 		System.out.println("Creando sw: " + cmd3.getSwitch().getInventoryId());
-		/*
+		
 		//Executing command add link sw-0_sw-1
 		singleton.execCommand("Here comes", cmd4);
-
+		System.out.println("Create link"  + cmd4.getLink().getInventoryId());
+		
+		
 		//Executing command add link sw-0_sw-2
 		singleton.execCommand("Here comes", cmd5);
 		
@@ -312,7 +344,18 @@ public class testing {
 		
 		//Executing command add link sw-2_sw-3
 		singleton.execCommand("Here comes", cmd8);
-		*/
+		
+		//Executing command add host pc0
+		singleton.execCommand("here comes", cmd9);
+		
+		//Executing command add host pc1
+		singleton.execCommand("here comes", cmd10);
+		
+		//Executing command add host pc2
+		singleton.execCommand("here comes", cmd11);
+		
+		//Executing command add host pc3
+		singleton.execCommand("here comes", cmd12);
 	}
 
 }

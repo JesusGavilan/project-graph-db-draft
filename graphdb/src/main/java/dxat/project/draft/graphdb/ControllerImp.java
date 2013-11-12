@@ -167,9 +167,12 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
+			System.out.println("Parameters link object: (source: sw,port, dest: sw,por, inventory) " + lnk.getSrcSwitch() + " " + lnk.getSrcPort() + " " + lnk.getDstSwitch() + " " + lnk.getDstPort() + " " + lnk.getInventoryId() );
 			//Getting switches that affects the link
 			Node srcSwitch = listIfaceDevices.get("inventoryId", lnk.getSrcSwitch()).getSingle();
-			Node dstSwitch = listIfaceDevices.get("inventoryID", lnk.getDstSwitch()).getSingle();
+			System.out.println("*****Name source node LINK:" + srcSwitch.getProperty("inventoryId"));
+			Node dstSwitch = listIfaceDevices.get("inventoryId", lnk.getDstSwitch()).getSingle();
+			System.out.println("*****Name source node LINK:" + dstSwitch.getProperty("inventoryId"));
 			Node srcIface = null;
 			Node dstIface = null;
 			
@@ -180,44 +183,45 @@ public class ControllerImp implements ControllerInterface {
 			//Building the interfaces id
 			String src = lnk.getSrcSwitch() + ":" + lnk.getSrcPort();
 			String dst = lnk.getDstSwitch() + ":" + lnk.getDstPort();
-			
+			System.out.println("**********SRC building interfaces" + src);
+			System.out.println("**********DST building interfaces" + dst);
 			//Looking for a interface switch of the src
 			for (Path elementPathSrc : elementsTraverserSrc){
-				
-				if ( (elementPathSrc.endNode().getProperty("inventoryId"))==src)
+				System.out.println("****** Name of the source interfaces: " + elementPathSrc.endNode().getProperty("inventoryId"));
+				if ( src.equals(elementPathSrc.endNode().getProperty("inventoryId"))){
+					System.out.println("****** Found the interface of the source *******");
 					srcIface = elementPathSrc.endNode();
+				}
 			}
 			
 			//Looking for a interface switch of th dst
 			for (Path elementPathDst : elementsTraverserDst){
-				
-				if( (elementPathDst.endNode().getProperty("inventoryId")) == dst)
+				System.out.println("****** Name of the destination interfaces: " + elementPathDst.endNode().getProperty("inventoryId"));
+				if( dst.equals(elementPathDst.endNode().getProperty("inventoryId")))
 					dstIface = elementPathDst.endNode();
 			}
-			
+			System.out.println("****Switch interface of the source: "+ srcIface.getProperty("inventoryId"));
+			System.out.println("****Switch interface of the destination: "+ dstIface.getProperty("inventoryId"));
 			//Creating the switch interface --> switch interface (LINK) relationship
 			Relationship link = srcIface.createRelationshipTo(dstIface, RelTypes.LINK);
+			
 			link.setProperty("id", "777");
-			
-			int capacity1 = (Integer) srcSwitch.getProperty("currentSpeed");
-			int capacity2 = (Integer) dstSwitch.getProperty("currentSpeed");
-			int bandwidth;
-			
-			if (capacity1>capacity2) bandwidth = capacity2;
-			else bandwidth=capacity1;
-			
-			link.setProperty("BW", bandwidth);
 			link.setProperty("status", true);
-			link.setProperty("srcSwitch", link.getProperty("srcSwitch"));
-			link.setProperty("srcPort", link.getProperty("srcPort"));
-			link.setProperty("dstSwitch", link.getProperty("dstSwitch"));
-			link.setProperty("type", link.getProperty("type"));
+			link.setProperty("srcSwitch", lnk.getSrcSwitch());
+			link.setProperty("srcPort", lnk.getSrcPort());
+			link.setProperty("dstSwitch", lnk.getDstSwitch());
+			link.setProperty("dstPort", lnk.getDstPort());
+			link.setProperty("inventoryId", lnk.getInventoryId());
+			link.setProperty("type", lnk.getType());
+			
+			tx.success();
 			
 		}
 		
 		finally
 		{
 			tx.finish();
+			graphDb.shutdown();
 		}
 		
 
