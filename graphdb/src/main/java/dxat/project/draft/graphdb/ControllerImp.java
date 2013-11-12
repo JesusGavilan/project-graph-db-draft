@@ -191,14 +191,17 @@ public class ControllerImp implements ControllerInterface {
 				if ( src.equals(elementPathSrc.endNode().getProperty("inventoryId"))){
 					System.out.println("****** Found the interface of the source *******");
 					srcIface = elementPathSrc.endNode();
+					break;
 				}
 			}
 			
 			//Looking for a interface switch of th dst
 			for (Path elementPathDst : elementsTraverserDst){
 				System.out.println("****** Name of the destination interfaces: " + elementPathDst.endNode().getProperty("inventoryId"));
-				if( dst.equals(elementPathDst.endNode().getProperty("inventoryId")))
+				if( dst.equals(elementPathDst.endNode().getProperty("inventoryId"))){
 					dstIface = elementPathDst.endNode();
+					break;
+				}
 			}
 			System.out.println("****Switch interface of the source: "+ srcIface.getProperty("inventoryId"));
 			System.out.println("****Switch interface of the destination: "+ dstIface.getProperty("inventoryId"));
@@ -230,15 +233,9 @@ public class ControllerImp implements ControllerInterface {
 	//Implementation for SW-Control link
 	public void addInternalLink(Node interface1, Node interface2){
 		Relationship link = interface1.createRelationshipTo(interface2, RelTypes.LINK);
+		System.out.println("*** internal link: " + interface1.getProperty("inventoryId")+ "  " + interface2.getProperty("inventoryId"));
 		link.setProperty("id", (String) interface1.getProperty("inventoryId") + "-"+ (String) interface2.getProperty("inventoryId"));
 		
-		int capacity1 = (Integer) interface1.getProperty("currentSpeed");
-		int capacity2 = (Integer) interface2.getProperty("currentSpeed");
-		int bandwidth;
-		
-		if (capacity1>capacity2) bandwidth = capacity2;
-		else bandwidth = capacity1;
-		link.setProperty("BW", bandwidth);
 		link.setProperty("status", true);
 		link.setProperty("srcSwitch", "");
 		link.setProperty("srcPort","");
@@ -300,35 +297,52 @@ public class ControllerImp implements ControllerInterface {
 			Node pc = graphDb.createNode();
 			
 			pc.setProperty("inventoryId", host.getHostId());
-			pc.setProperty("IP", host.getIpv4());
+			pc.setProperty("IP", host.getIpv4().get(0));
 			//pc.setProperty("MAC", host.getMac());
 			pc.setProperty("DHCP", host.getDhcpName());
 			//pc.setProperty("PortId", host.getPortId());
-			pc.setProperty("SwitchId", host.getSwId());
-			pc.setProperty("VLAN", host.getVlan());
+			pc.setProperty("SwitchId", host.getSwId().get(0));
+			pc.setProperty("VLAN", host.getVlan().get(0));
 			//Added to index
 			listIfaceDevices.add(pc, "inventoryId", host.getHostId());
 			//Create host interface
 			
 			Node iface = graphDb.createNode();
-			iface.setProperty("inventoryId", host.getSwId() + ":" + host.getPortId()); //SW-XX:PORT
-			iface.setProperty("portId", host.getPortId());
+			iface.setProperty("inventoryId", host.getHostId() + ":" + host.getPortId().get(0)); //SW-XX:PORT
+			iface.setProperty("portId", host.getPortId().get(0));
 			iface.setProperty("status",  false);
 			iface.setProperty("enabled", false);
 			iface.setProperty("mac", host.getMac());
-			iface.setProperty("ip", host.getMac()); //NGTH
+			iface.setProperty("ip", host.getIpv4().get(0)); //NGTH
 			iface.setProperty("currentSpeed", "");//10/100/1000 Mbps
 				
 			//Creating the host --> host interface relationship
 			pc.createRelationshipTo(iface, RelTypes.HAS);
 			
+			//Looking for a interface switch to LINK with interface host
+			Traverser elementsTraverserSw = getInterfaceSwitch(listIfaceDevices.get("inventoryId", host.getSwId().get(0)).getSingle());
+			
+			//Looking for a interface switch of the src
+			Node swIface = null;
+			String swInterface = host.getSwId().get(0).toString() + ":" + host.getPortId().get(0).toString();
+			System.out.println("****** Name of the switch interface build it: " + swInterface);
+			for (Path elementPathSw : elementsTraverserSw){
+				System.out.println("****** Name of the switch interfaces: " + elementPathSw.endNode().getProperty("inventoryId"));
+				if ( swInterface.equals(elementPathSw.endNode().getProperty("inventoryId").toString())){
+					System.out.println("****** Found the interface of switch to connect pc *******");
+					swIface = elementPathSw.endNode();
+					break;
+				}
+			}
+			
 			//Creating LINK interface switch --> controllerIface relationship
-			addInternalLink(pc, iface);
+			addInternalLink(iface, swIface);
 			
 			tx.success();
 		}
 		finally{
 			tx.finish();
+			graphDb.shutdown();
 		}
 	}
 

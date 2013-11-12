@@ -345,6 +345,7 @@ public class testing {
 		//Executing command add link sw-2_sw-3
 		singleton.execCommand("Here comes", cmd8);
 		
+		
 		//Executing command add host pc0
 		singleton.execCommand("here comes", cmd9);
 		
@@ -356,6 +357,7 @@ public class testing {
 		
 		//Executing command add host pc3
 		singleton.execCommand("here comes", cmd12);
+		
 	}
 
 }
