@@ -67,13 +67,13 @@ public class testing {
 		cmd0.setObject("here comes object serialized");
 		cmd0.setSource("SWITCH");
 		cmd0.setSwitch(swCollection.getDevices().get(0));
-		
+		System.out.println("name collection 0: " + swCollection.getDevices().get(0).getInventoryId());
 		//Creating command --> add sw1
 		Command cmd1 = new Command();
-		cmd0.setEvent("ADD_SWITCH");
-		cmd0.setObject("here comes object serialized");
-		cmd0.setSource("SWITCH");
-		cmd0.setSwitch(swCollection.getDevices().get(1));
+		cmd1.setEvent("ADD_SWITCH");
+		cmd1.setObject("here comes object serialized");
+		cmd1.setSource("SWITCH");
+		cmd1.setSwitch(swCollection.getDevices().get(1));
 		
 		//Creating command --> add LINK
 		Command cmd2 = new Command();
@@ -83,10 +83,10 @@ public class testing {
 		
 		SingletonNode singleton = SingletonNode.getInstance();
 		//Executing command add sw0
-		singleton.execCommand("Here comes ", cmd0);
+		//singleton.execCommand("Here comes ", cmd0);
 		
 		//Executing command add sw1
-		//singleton.execCommand(cmd1);
+		singleton.execCommand("Here comes ", cmd1);
 		
 		//Executing command add LINK
 		//singleton.execCommand(cmd2);

@@ -12,6 +12,7 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
@@ -95,7 +96,7 @@ public class ControllerImp implements ControllerInterface {
 			tx.finish();
 		}
 		
-
+		registerShutdownHook();
 	}
 
 	@Override
@@ -374,9 +375,10 @@ public class ControllerImp implements ControllerInterface {
 		
 		deleteFileOrDirectory( new File(DB_PATH));
 		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		listIfaceDevices = graphDb.index().forNodes("devices");
-		root = getControllerNode();	 
-		registerShutdownHook();
+		listIfaceDevices = graphDb.index().forNodes("inventoryId");
+		System.out.println("***** DENTRO DEL setUp:nombre del SDNnetwork"+ listIfaceDevices.get("inventoryId","SDNnetwork").getSingle());
+		root = getControllerNode();
+				
 	}
 	
 	public void shutDown(){
@@ -400,17 +402,23 @@ public class ControllerImp implements ControllerInterface {
 		
 		if( !file.exists())
 		{
+			System.out.println("*************** DENTRO DEL NO EXISTS *********");
 			return;
 		}
 		if(file.isDirectory())
-		{
+		{   System.out.println("*************** DENTRO DEL IS DIRECTORY");
 			for (File child : file.listFiles())
 			{
 				deleteFileOrDirectory(child);
 			}
 		}
+		if( file.exists()){
+			System.out.println("*************** DENTRO DEL EXISTS ********");
+			return;
+		}
 		else
-		{
+		{   System.out.println("*************** DENTRO DEL DELETE ******** " + file.getAbsolutePath());
+			
 			file.delete();
 		}
 		
@@ -418,8 +426,8 @@ public class ControllerImp implements ControllerInterface {
 	
 	private Node getControllerNode()
 	{
-		if (listIfaceDevices.get("inventoryId", "SDNController").getSingle()==null){
-			//System.out.println("*********** Creando el controlador *********" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
+		if (listIfaceDevices.get("inventoryId", "SDNnetwork").getSingle()==null){
+			System.out.println("*********** Creando el nodo network, controllador *********" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
 			Transaction tx = graphDb.beginTx();
 			
 			try
@@ -453,7 +461,7 @@ public class ControllerImp implements ControllerInterface {
 		}
 		
 		else{
-			System.out.println("************** Existe el controlador ****************" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
+			System.out.println("************** Existe el controlador ****************" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle().getProperty("inventoryId"));
 			return listIfaceDevices.get("inventoryId", "SDNcontroller").getSingle();	
 		}
 			
