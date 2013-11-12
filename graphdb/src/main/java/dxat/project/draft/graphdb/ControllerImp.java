@@ -84,6 +84,7 @@ public class ControllerImp implements ControllerInterface {
 				}
 				
 				//creating the switch --> switch interface relationship
+				System.out.println("******sw: " + dev.getProperty("inventoryId")+ " connected to " + nodeIface.getProperty("inventoryId")  );
 				dev.createRelationshipTo(nodeIface, RelTypes.HAS);				
 
 			}
@@ -490,6 +491,7 @@ public class ControllerImp implements ControllerInterface {
 			root.createRelationshipTo(controllerIface, RelTypes.HAS);
 			
 			//Creating LINK interface switch --> controllerIface relationship
+			System.out.println("******* switch iface: " + iface.getProperty("inventoryId") + "  controller iface: " + controllerIface.getProperty("inventoryId"));
 			iface.createRelationshipTo(controllerIface, RelTypes.LINK);
 			
 		}

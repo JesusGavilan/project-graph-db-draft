@@ -32,6 +32,38 @@ public class testing {
 			ifaceCollection1.addInterface(iface1);		
 		}
 		
+		//Populating a iface collection for sw2
+		for (int i=0;i<5;i++){
+			Interface iface = new Interface();
+			iface.setInventoryId("SW-0:" + i);
+			iface.setMac("00:1e:68:bf:81:0"+ i);
+			iface.setPortId(i);
+			iface.setCurrentSpeed(100);
+			iface.setEnabled(true);
+			ifaceCollection0.addInterface(iface);
+		}
+		//Populating a iface collection for sw3
+		for (int i=0; i<5;i++){
+			Interface iface1 = new Interface();
+			iface1.setInventoryId("SW-1:" + i);
+			iface1.setMac("00:1e:68:bf:81:1"+ i);
+			iface1.setPortId(i);
+			iface1.setCurrentSpeed(100);
+			iface1.setEnabled(true);
+			ifaceCollection1.addInterface(iface1);		
+		}
+
+		//Populating a iface collection for sw3
+				for (int i=0; i<5;i++){
+					Interface iface1 = new Interface();
+					iface1.setInventoryId("SW-1:" + i);
+					iface1.setMac("00:1e:68:bf:81:1"+ i);
+					iface1.setPortId(i);
+					iface1.setCurrentSpeed(100);
+					iface1.setEnabled(true);
+					ifaceCollection1.addInterface(iface1);		
+				}
+		
 		//Creating a switch collection
 		SwitchCollection swCollection = new SwitchCollection();
  		
