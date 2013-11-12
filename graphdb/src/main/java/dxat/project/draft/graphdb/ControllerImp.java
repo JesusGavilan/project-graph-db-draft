@@ -95,9 +95,10 @@ public class ControllerImp implements ControllerInterface {
 		finally
 		{
 			tx.finish();
+			graphDb.shutdown();
 		}
+		//registerShutdownHook();
 		
-		registerShutdownHook();
 	}
 
 	@Override
@@ -410,8 +411,10 @@ public class ControllerImp implements ControllerInterface {
 		{   System.out.println("*************** DENTRO DEL IS DIRECTORY");
 			for (File child : file.listFiles())
 			{
+				System.out.println("**** child" + child.getAbsolutePath());
 				deleteFileOrDirectory(child);
 			}
+			
 		}
 		if( file.exists()){
 			System.out.println("*************** DENTRO DEL EXISTS ********");

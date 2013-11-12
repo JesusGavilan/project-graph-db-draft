@@ -1,5 +1,6 @@
 package dxat.project.draft.graphdb;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class testing {
 
@@ -36,23 +37,23 @@ public class testing {
 		
 		//Populating a iface collection for sw2
 		for (int i=0;i<5;i++){
-			Interface iface = new Interface();
-			iface.setInventoryId("SW-2:" + i);
-			iface.setMac("00:1e:68:bf:81:0"+ i);
-			iface.setPortId(i);
-			iface.setCurrentSpeed(100);
-			iface.setEnabled(true);
-			ifaceCollection0.addInterface(iface2);
+			Interface iface2 = new Interface();
+			iface2.setInventoryId("SW-2:" + i);
+			iface2.setMac("00:1e:68:bf:81:0"+ i);
+			iface2.setPortId(i);
+			iface2.setCurrentSpeed(100);
+			iface2.setEnabled(true);
+			ifaceCollection2.addInterface(iface2);
 		}
 		//Populating a iface collection for sw3
 		for (int i=0; i<5;i++){
-			Interface iface1 = new Interface();
-			iface1.setInventoryId("SW-3:" + i);
-			iface1.setMac("00:1e:68:bf:81:1"+ i);
-			iface1.setPortId(i);
-			iface1.setCurrentSpeed(100);
-			iface1.setEnabled(true);
-			ifaceCollection1.addInterface(iface3);		
+			Interface iface3 = new Interface();
+			iface3.setInventoryId("SW-3:" + i);
+			iface3.setMac("00:1e:68:bf:81:1"+ i);
+			iface3.setPortId(i);
+			iface3.setCurrentSpeed(100);
+			iface3.setEnabled(true);
+			ifaceCollection3.addInterface(iface3);		
 		}
 		
 		//Creating a switch collection
@@ -62,7 +63,9 @@ public class testing {
 			Switch sw = new Switch();
 			sw.setInventoryId("SW-"+i);
 			if (i==0) sw.setInterfaces(ifaceCollection0);
-			else	sw.setInterfaces(ifaceCollection1);
+			if (i==1) sw.setInterfaces(ifaceCollection1);
+			if (i==2) sw.setInterfaces(ifaceCollection2);
+			if (i==3) sw.setInterfaces(ifaceCollection3);
 			
 			sw.setHardware("Microtik");
 			sw.setManufacturer("RouterBOARD 750GL");
@@ -74,141 +77,145 @@ public class testing {
 			sw.setType("");
 			swCollection.addDevice(sw);
 		}
+		System.out.println("Posicion 0 de collection sw: " + swCollection.getDevices().get(0).getInventoryId());
+		System.out.println("Posicion 1 de collection sw: " + swCollection.getDevices().get(1).getInventoryId());
+		System.out.println("Posicion 2 de collection sw: " + swCollection.getDevices().get(2).getInventoryId());
+		System.out.println("Posicion 3 de collection sw: " + swCollection.getDevices().get(3).getInventoryId());
 		
 		//Creating a host instances
 		//Host 0 parameters
-		List<String> ip0 = new List<String>();
-		List<Short> vlan0= new List<Short>();
-		List<String> swId0 = new List<String>();
-		List<Integer> portId0 = new List<Integer();
+
+		
+		List<String> ip0 = new ArrayList<String>();
+		List<Short> vlan0= new ArrayList<Short>();
+		List<String> swId0 = new ArrayList<String>();
+		List<Integer> portId0 = new ArrayList<Integer>();
 		
 		ip0.add("192.168.8.0");
-		vlan0.add(1);
+		vlan0.add((short) 1);
 		swId0.add("SW-0");
 		portId0.add(1);
 		
 		//Host 1 parameters
-		List<String> ip1 = new List<String>();
-                List<Short> vlan1= new List<Short>();
-                List<String> swId1 = new List<String>();
-                List<Integer> portId1 = new List<Integer();
+		List<String> ip1 = new ArrayList<String>();
+        List<Short> vlan1= new ArrayList<Short>();
+        List<String> swId1 = new ArrayList<String>();
+        List<Integer> portId1 = new ArrayList<Integer>();
 
-                ip1.add("192.168.8.1");
-                vlan1.add(1);           
-                swId1.add("SW-0");      
-                portId1.add(2); 		
+        ip1.add("192.168.8.1");
+        vlan1.add((short)1);           
+        swId1.add("SW-0");      
+        portId1.add(2); 		
 		
 		//Host 2 parameters
-		List<String> ip2 = new List<String>();
-                List<Short> vlan2= new List<Short>();
-                List<String> swId2 = new List<String>();
-                List<Integer> portId2 = new List<Integer();
+		List<String> ip2 = new ArrayList<String>();
+		List<Short> vlan2= new ArrayList<Short>();
+        List<String> swId2 = new ArrayList<String>();
+        List<Integer> portId2 = new ArrayList<Integer>();
 
-                ip2.add("192.168.8.2");
-                vlan2.add(1);           
-                swId2.add("SW-3");      
-                portId2.add(4); 	
+        ip2.add("192.168.8.2");
+        vlan2.add((short)1);           
+        swId2.add("SW-3");      
+        portId2.add(4); 	
 
 		//Host 3 parameters
-		List<String> ip3 = new List<String>();
-                List<Short> vlan3 = new List<Short>();
-                List<String> swId3 = new List<String>();
-                List<Integer> portId3 = new List<Integer();
+		List<String> ip3 = new ArrayList<String>();
+        List<Short> vlan3 = new ArrayList<Short>();
+        List<String> swId3 = new ArrayList<String>();
+        List<Integer> portId3 = new ArrayList<Integer>();
 
-                ip3.add("192.168.8.3");
-                vlan3.add(1);           
-                swId3.add("SW-3");      
-                portId3.add(3); 
+        ip3.add("192.168.8.3");
+        vlan3.add((short)1);           
+        swId3.add("SW-3");      
+        portId3.add(3); 
 		
 		//Host0 instance	
 		Host pc0 = new Host();
 		pc0.setHostId("PC-0");
 		pc0.setDhcpName("162.168.8.8");
 		pc0.setMac("84:2b:2b:ab:7f:40");
-		pc0.setIpv4(ip0)
-		pc0.setVlan(vlan0)
-		pc0.setSwId(swId0)
-		pc0.setPortId(portId0) 
+		pc0.setIpv4(ip0);
+		pc0.setVlan(vlan0);
+		pc0.setSwId(swId0);
+		pc0.setPortId(portId0); 
 		
 		//Host1 instance
 		Host pc1 = new Host();
-                pc1.setHostId("PC-1");
-                pc1.setDhcpName("162.168.8.8");
-                pc1.setMac("84:2b:2b:ab:7f:41");
-                pc1.setIpv4(ip1)
-                pc1.setVlan(vlan1)
-                pc1.setSwId(swId1)
-                pc1.setPortId(portId1)
+        pc1.setHostId("PC-1");
+        pc1.setDhcpName("162.168.8.8");
+        pc1.setMac("84:2b:2b:ab:7f:41");
+        pc1.setIpv4(ip1);
+        pc1.setVlan(vlan1);
+        pc1.setSwId(swId1);
+        pc1.setPortId(portId1);
 
 
 		//Host2 instance
 		Host pc2 = new Host();
 		pc2.setHostId("PC-2");
-                pc2.setDhcpName("162.168.8.8");
-                pc2.setMac("84:2b:2b:ab:7f:42");
-                pc2.setIpv4(ip2)
-                pc2.setVlan(vlan2)
-                pc2.setSwId(swId2)
-                pc2.setPortId(portId2)
+		pc2.setDhcpName("162.168.8.8");
+        pc2.setMac("84:2b:2b:ab:7f:42");
+        pc2.setIpv4(ip2);
+        pc2.setVlan(vlan2);
+        pc2.setSwId(swId2);
+        pc2.setPortId(portId2);
 		
-		//Host3 instance
-                Host pc3 = new Host();
-		pc3.setHostId("PC-3");
-                pc3.setDhcpName("162.168.8.8");
-                pc3.setMac("84:2b:2b:ab:7f:40");
-                pc3.setIpv4(ip3)
-                pc3.setVlan(vlan3)
-                pc3.setSwId(swId3)
-                pc3.setPortId(portId3)
-			
+        //Host3 instance
+        Host pc3 = new Host();
+        pc3.setHostId("PC-3");
+        pc3.setDhcpName("162.168.8.8");
+        pc3.setMac("84:2b:2b:ab:7f:40");
+        pc3.setIpv4(ip3);
+        pc3.setVlan(vlan3);
+        pc3.setSwId(swId3);
+        pc3.setPortId(portId3);
+
 	
 		//Creating a LINK instances
 		//Creatin LINK SW-0_SW-1
 		Link lnk1 = new Link();
-		lnk.setSrcSwitch("SW-0");
-		lnk.setSrcPort(1);
-		lnk.setDstSwitch("SW-1");
-		lnk.setDstPort(1);
-		lnk.setInventoryId("SW-0:1_SW-1:1");
-		lnk.setType("");
-		
+		lnk1.setSrcSwitch("SW-0");
+		lnk1.setSrcPort(1);
+		lnk1.setDstSwitch("SW-1");
+		lnk1.setDstPort(1);
+		lnk1.setInventoryId("SW-0:1_SW-1:1");
+		lnk1.setType("");
+
 		//Creatin LINK SW-0_SW-2
-                Link lnk2 = new Link();
-                lnk.setSrcSwitch("SW-0");
-                lnk.setSrcPort(1);
-                lnk.setDstSwitch("SW-2");
-                lnk.setDstPort(1);
-                lnk.setInventoryId("SW-0:1_SW-1:1");
-                lnk.setType("");
+		Link lnk2 = new Link();
+		lnk2.setSrcSwitch("SW-0");
+		lnk2.setSrcPort(1);
+		lnk2.setDstSwitch("SW-2");
+		lnk2.setDstPort(1);
+		lnk2.setInventoryId("SW-0:1_SW-1:1");
+		lnk2.setType("");
 
 		//Creatin LINK SW-1_SW-2
-                Link lnk3 = new Link();
-                lnk.setSrcSwitch("SW-0");
-                lnk.setSrcPort(1);
-                lnk.setDstSwitch("SW-1");
-                lnk.setDstPort(1);
-                lnk.setInventoryId("SW-0:1_SW-1:1");
-                lnk.setType("");
-		
+		Link lnk3 = new Link();
+		lnk3.setSrcSwitch("SW-0");
+		lnk3.setSrcPort(1);
+		lnk3.setDstSwitch("SW-1");
+		lnk3.setDstPort(1);
+		lnk3.setInventoryId("SW-0:1_SW-1:1");
+		lnk3.setType("");
+
 		//Creatin LINK SW-1_SW-3
-                Link lnk4 = new Link();
-                lnk.setSrcSwitch("SW-0");
-                lnk.setSrcPort(1);
-                lnk.setDstSwitch("SW-1");
-                lnk.setDstPort(1);
-                lnk.setInventoryId("SW-0:1_SW-1:1");
-                lnk.setType("");
+		Link lnk4 = new Link();
+		lnk4.setSrcSwitch("SW-0");
+		lnk4.setSrcPort(1);
+		lnk4.setDstSwitch("SW-1");
+		lnk4.setDstPort(1);
+		lnk4.setInventoryId("SW-0:1_SW-1:1");
+		lnk4.setType("");
 
 		//Creatin LINK SW-2_SW-3
-                Link lnk5 = new Link();
-                lnk.setSrcSwitch("SW-0");
-                lnk.setSrcPort(1);
-                lnk.setDstSwitch("SW-1");
-                lnk.setDstPort(1);
-                lnk.setInventoryId("SW-0:1_SW-1:1");
-                lnk.setType("");
-
-
+		Link lnk5 = new Link();
+		lnk5.setSrcSwitch("SW-0");
+		lnk5.setSrcPort(1);
+		lnk5.setDstSwitch("SW-1");
+		lnk5.setDstPort(1);
+		lnk5.setInventoryId("SW-0:1_SW-1:1");
+		lnk5.setType("");
 		
 		//Creating command --> add sw0
 		Command cmd0 = new Command();
@@ -216,7 +223,7 @@ public class testing {
 		cmd0.setObject("here comes object serialized");
 		cmd0.setSource("SWITCH");
 		cmd0.setSwitch(swCollection.getDevices().get(0));
-		System.out.println("name collection 0: " + swCollection.getDevices().get(0).getInventoryId());
+		
 		//Creating command --> add sw1
 		Command cmd1 = new Command();
 		cmd1.setEvent("ADD_SWITCH");
@@ -224,24 +231,88 @@ public class testing {
 		cmd1.setSource("SWITCH");
 		cmd1.setSwitch(swCollection.getDevices().get(1));
 		
-		//Creating command --> add LINK
+		//Creating command --> add sw2
 		Command cmd2 = new Command();
-		cmd2.setEvent("ADD_LINK");
+		cmd2.setEvent("ADD_SWITCH");
 		cmd2.setObject("here comes object serialized");
-		cmd2.setSource("LINK");
+		cmd2.setSource("SWITCH");
+		cmd2.setSwitch(swCollection.getDevices().get(2));
+
+		//Creating command --> add sw3
+		Command cmd3 = new Command();
+		cmd3.setEvent("ADD_SWITCH");
+		cmd3.setObject("here comes object serialized");
+		cmd3.setSource("SWITCH");
+		cmd3.setSwitch(swCollection.getDevices().get(3));
+
+		
+		//Creating command --> add LINK SW-0_SW-1
+		Command cmd4 = new Command();
+		cmd4.setEvent("ADD_LINK");
+		cmd4.setObject("here comes object serialized");
+		cmd4.setSource("LINK");
+		cmd4.setLink(lnk1);
+	
+		//Creating command --> add LINK SW-0_SW-2
+		Command cmd5 = new Command();
+		cmd5.setEvent("ADD_LINK");
+		cmd5.setObject("here comes object serialized");
+		cmd5.setSource("LINK");
+		cmd5.setLink(lnk2);
+		
+		//Creating command --> add LINK SW-1_SW-2
+		Command cmd6 = new Command();
+		cmd6.setEvent("ADD_LINK");
+		cmd6.setObject("here comes object serialized");
+		cmd6.setSource("LINK");
+		cmd6.setLink(lnk3);
+		
+		//Creating command --> add LINK SW-1_SW-3
+		Command cmd7 = new Command();
+		cmd7.setEvent("ADD_LINK");
+		cmd7.setObject("here comes object serialized");
+		cmd7.setSource("LINK");
+		cmd7.setLink(lnk4);
+		
+		//Creating command --> add LINK SW-0_SW-2
+		Command cmd8 = new Command();
+		cmd8.setEvent("ADD_LINK");
+		cmd8.setObject("here comes object serialized");
+		cmd8.setSource("LINK");
+		cmd8.setLink(lnk5);
 		
 		SingletonNode singleton = SingletonNode.getInstance();
 		//Executing command add sw0
-		//singleton.execCommand("Here comes ", cmd0);
+		singleton.execCommand("Here comes ", cmd0);
+		System.out.println("Creando sw: " + cmd0.getSwitch().getInventoryId());
 		
 		//Executing command add sw1
 		singleton.execCommand("Here comes ", cmd1);
+		System.out.println("Creando sw: " + cmd1.getSwitch().getInventoryId());
+	
+		//Executing command add sw2
+		singleton.execCommand("Here comes", cmd2);
+		System.out.println("Creando sw: " + cmd2.getSwitch().getInventoryId());
 		
-		//Executing command add LINK
-		//singleton.execCommand(cmd2);
+		//Executing command add sw3
+		singleton.execCommand("Here comes", cmd3);
+		System.out.println("Creando sw: " + cmd3.getSwitch().getInventoryId());
+		/*
+		//Executing command add link sw-0_sw-1
+		singleton.execCommand("Here comes", cmd4);
+
+		//Executing command add link sw-0_sw-2
+		singleton.execCommand("Here comes", cmd5);
 		
+		//Executing command add link sw-1_sw-2
+		singleton.execCommand("Here comes", cmd6);
 		
+		//Executing command add link sw-1_sw-3
+		singleton.execCommand("Here comes", cmd7);
 		
+		//Executing command add link sw-2_sw-3
+		singleton.execCommand("Here comes", cmd8);
+		*/
 	}
 
 }
