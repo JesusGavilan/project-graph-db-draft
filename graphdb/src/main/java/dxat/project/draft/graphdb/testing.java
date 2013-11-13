@@ -309,8 +309,41 @@ public class testing {
 		cmd12.setSource("HOST");
 		cmd12.setHost(pc3);
 		
-		SingletonNode singleton = SingletonNode.getInstance();
+		//Creating command --> delete SW-0
+		Command cmd13 = new Command();
+		cmd13.setEvent("DELETE_SWITCH");
+		cmd13.setObject("SW-0");
+		cmd13.setSource("SWITCH");
+
+		//Creating command --> delete SW-1
+		Command cmd14 = new Command();
+		cmd14.setEvent("DELETE_SWITCH");
+		cmd14.setObject("SW-1");
+		cmd14.setSource("SWITCH");
 		
+		//Creating command --> delete SW-3
+		Command cmd15 = new Command();
+		cmd15.setEvent("DELETE_SWITCH");
+		cmd15.setObject("SW-3");
+		cmd15.setSource("SWITCH");
+		
+		//Creating command --> delete sw-1_sw-3
+		Command cmd16 = new Command();
+		cmd16.setEvent("DELETE_LINK");
+		cmd16.setObject("Here comes object serialized");
+		cmd16.setLink(lnk4);
+		cmd16.setSource("LINK");
+
+		//Creating command --> delete sw-0_sw-2
+		Command cmd17 = new Command();
+		cmd17.setEvent("DELETE_LINK");
+		cmd17.setObject("Here comes object serialized");
+		cmd17.setLink(lnk2);
+		cmd17.setSource("LINK");
+		
+		
+		SingletonNode singleton = SingletonNode.getInstance();
+		/*
 		//Executing command add sw0
 		singleton.execCommand("Here comes ", cmd0);
 		System.out.println("Creando sw: " + cmd0.getSwitch().getInventoryId());
@@ -357,6 +390,25 @@ public class testing {
 		
 		//Executing command add host pc3
 		singleton.execCommand("here comes", cmd12);
+		
+		//Executing command delete sw-0
+		singleton.execCommand("here comes", cmd13);
+		
+		//Executing command delete sw-1
+		singleton.execCommand("here comes", cmd14);
+		
+		//Executing command delete sw-2
+		singleton.execCommand("here comes", cmd15 );
+		
+		//Executing command add sw0 again
+		singleton.execCommand("Here comes ", cmd0);
+		*/
+		
+		//Executing command delete link sw-1_sw-3
+		singleton.execCommand("Here comes", cmd16);
+		
+		//Executing command delete link sw-0_sw-2
+		singleton.execCommand("Here comes", cmd17);
 		
 	}
 

@@ -121,33 +121,45 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
-			Node sw = listIfaceDevices.get("InventoryId",swId).getSingle();
-			
+			System.out.println("****** Swithc name that pass to delete" + swId);
+			Node sw = listIfaceDevices.get("inventoryId",swId).getSingle();
+			System.out.println("****** Switch name to delete" + sw.getProperty("inventoryId").toString());
 			//Get the interfaces from this node
 			Traverser elementsTraverserNode = getInterfaceSwitch(sw);
 			for(Path elementNode: elementsTraverserNode){
 				//Deleting interface--> interface relationships. Deleting all the LINKS related to this node.
-				elementNode.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH).delete();
-				//Deleting interface--> switch relationship
-				elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
-				//Deleting interface
+				Relationship pathLink = elementNode.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
+				Relationship pathHas  = elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH);
+                if (pathLink!= null){
+                	elementNode.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH).delete();
+    				//Deleting interface--> switch relationship
+    				elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
+                }
+                else elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
+				
+                //Deleting interface
 				elementNode.endNode().delete();
 			}
 			
 			//Deleting interface to Controller
 			String idCT= "CT-" + sw.getProperty("inventoryId") + ":" + sw.getProperty("portConfig");
-
+			System.out.println("**********Name of the controller interface to delete " + idCT);
+			
 			Traverser elementsTraverserController = getInterfaceController(root);
 			for(Path elementController: elementsTraverserController){
-				if(elementController.endNode().getProperty("inventoryId")==idCT){
+				System.out.println("***** Name of the controller interfaces " + elementController.endNode().getProperty("inventoryId"));
+				if(idCT.equals(elementController.endNode().getProperty("inventoryId"))){
 					//Deleting interface controller-->controller relationship
 					elementController.endNode().getSingleRelationship(RelTypes.HAS, Direction.INCOMING).delete();
 					//Deleting interface controller
 					elementController.endNode().delete();
+					break;
 				}
 			}
 			//Deleting switch
+			listIfaceDevices.remove(sw);
 			sw.delete();
+			
 			
 			tx.success();
 			
@@ -155,6 +167,7 @@ public class ControllerImp implements ControllerInterface {
 		finally
 		{
 			tx.finish();
+			graphDb.shutdown();
 		}
 		
 	}
@@ -262,19 +275,19 @@ public class ControllerImp implements ControllerInterface {
 			
 			//Getting the parameters
 			String src = lnk.getSrcSwitch() + ":" + lnk.getSrcPort();
-			String dst = lnk.getDstSwitch() + ":" + lnk.getDstPort();
 			
 			//Getting Switch nodes that affects links
 			Node srcSwitch = listIfaceDevices.get("inventoryId", lnk.getSrcSwitch()).getSingle();
-			Node srcIface;
+			
 			
 			//Getting interfaces of the sw that affects links
 			Traverser elementsTraverserSrc = getInterfaceSwitch(srcSwitch);
 			//Finding and deleting
 			for(Path elementSrc : elementsTraverserSrc){
-				if(elementSrc.endNode().getProperty("inventoryId")==src){
+				if( src.equals(elementSrc.endNode().getProperty("inventoryId"))){
 					//Deleting link
-					elementSrc.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH).delete();
+					Relationship pathLink = elementSrc.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
+					if(pathLink!=null) pathLink.delete();
 				}
 			}
 			
@@ -282,6 +295,7 @@ public class ControllerImp implements ControllerInterface {
 		}
 		finally{
 			tx.finish();
+			graphDb.shutdown();
 		}
 
 	}
@@ -422,25 +436,21 @@ public class ControllerImp implements ControllerInterface {
 		
 		if( !file.exists())
 		{
-			System.out.println("*************** DENTRO DEL NO EXISTS *********");
 			return;
 		}
 		if(file.isDirectory())
-		{   System.out.println("*************** DENTRO DEL IS DIRECTORY");
+		{   
 			for (File child : file.listFiles())
 			{
-				System.out.println("**** child" + child.getAbsolutePath());
 				deleteFileOrDirectory(child);
 			}
 			
 		}
 		if( file.exists()){
-			System.out.println("*************** DENTRO DEL EXISTS ********");
 			return;
 		}
 		else
-		{   System.out.println("*************** DENTRO DEL DELETE ******** " + file.getAbsolutePath());
-			
+		{   			
 			file.delete();
 		}
 		
