@@ -12,8 +12,6 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexManager;
-import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
@@ -72,7 +70,7 @@ public class ControllerImp implements ControllerInterface {
 				//Create the device --> controller relationship
 				
 				Node nodeIface;
-				System.out.println("********** Creando ifaces " + Integer.valueOf(ifaceConfigParameters[0])+ "  " + iface.getPortId());
+	
 				if (Integer.valueOf(ifaceConfigParameters[0])==iface.getPortId()) {
 		          
 					nodeIface = createNodeInterface(iface, device.getType(), device.getOfAddr());
@@ -84,7 +82,7 @@ public class ControllerImp implements ControllerInterface {
 				}
 				
 				//creating the switch --> switch interface relationship
-				System.out.println("******sw: " + dev.getProperty("inventoryId")+ " connected to " + nodeIface.getProperty("inventoryId")  );
+				
 				dev.createRelationshipTo(nodeIface, RelTypes.HAS);				
 
 			}
@@ -165,15 +163,13 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
-			System.out.println("****** Swithc name that pass to delete" + swId);
 			Node sw = listIfaceDevices.get("inventoryId",swId).getSingle();
-			System.out.println("****** Switch name to delete" + sw.getProperty("inventoryId").toString());
 			//Get the interfaces from this node
 			Traverser elementsTraverserNode = getInterfaceSwitch(sw);
 			for(Path elementNode: elementsTraverserNode){
 				//Deleting interface--> interface relationships. Deleting all the LINKS related to this node.
 				Relationship pathLink = elementNode.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
-				Relationship pathHas  = elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH);
+				//Relationship pathHas  = elementNode.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH);
                 if (pathLink!= null){
                 	elementNode.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH).delete();
     				//Deleting interface--> switch relationship
@@ -187,11 +183,9 @@ public class ControllerImp implements ControllerInterface {
 			
 			//Deleting interface to Controller
 			String idCT= "CT-" + sw.getProperty("inventoryId") + ":" + sw.getProperty("portConfig");
-			System.out.println("**********Name of the controller interface to delete " + idCT);
 			
 			Traverser elementsTraverserController = getInterfaceController(root);
 			for(Path elementController: elementsTraverserController){
-				System.out.println("***** Name of the controller interfaces " + elementController.endNode().getProperty("inventoryId"));
 				if(idCT.equals(elementController.endNode().getProperty("inventoryId"))){
 					//Deleting interface controller-->controller relationship
 					elementController.endNode().getSingleRelationship(RelTypes.HAS, Direction.INCOMING).delete();
@@ -224,12 +218,9 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
-			System.out.println("Parameters link object: (source: sw,port, dest: sw,por, inventory) " + lnk.getSrcSwitch() + " " + lnk.getSrcPort() + " " + lnk.getDstSwitch() + " " + lnk.getDstPort() + " " + lnk.getInventoryId() );
 			//Getting switches that affects the link
 			Node srcSwitch = listIfaceDevices.get("inventoryId", lnk.getSrcSwitch()).getSingle();
-			System.out.println("*****Name source node LINK:" + srcSwitch.getProperty("inventoryId"));
 			Node dstSwitch = listIfaceDevices.get("inventoryId", lnk.getDstSwitch()).getSingle();
-			System.out.println("*****Name source node LINK:" + dstSwitch.getProperty("inventoryId"));
 			Node srcIface = null;
 			Node dstIface = null;
 			
@@ -240,13 +231,9 @@ public class ControllerImp implements ControllerInterface {
 			//Building the interfaces id
 			String src = lnk.getSrcSwitch() + ":" + lnk.getSrcPort();
 			String dst = lnk.getDstSwitch() + ":" + lnk.getDstPort();
-			System.out.println("**********SRC building interfaces" + src);
-			System.out.println("**********DST building interfaces" + dst);
 			//Looking for a interface switch of the src
 			for (Path elementPathSrc : elementsTraverserSrc){
-				System.out.println("****** Name of the source interfaces: " + elementPathSrc.endNode().getProperty("inventoryId"));
 				if ( src.equals(elementPathSrc.endNode().getProperty("inventoryId"))){
-					System.out.println("****** Found the interface of the source *******");
 					srcIface = elementPathSrc.endNode();
 					break;
 				}
@@ -254,14 +241,11 @@ public class ControllerImp implements ControllerInterface {
 			
 			//Looking for a interface switch of th dst
 			for (Path elementPathDst : elementsTraverserDst){
-				System.out.println("****** Name of the destination interfaces: " + elementPathDst.endNode().getProperty("inventoryId"));
 				if( dst.equals(elementPathDst.endNode().getProperty("inventoryId"))){
 					dstIface = elementPathDst.endNode();
 					break;
 				}
 			}
-			System.out.println("****Switch interface of the source: "+ srcIface.getProperty("inventoryId"));
-			System.out.println("****Switch interface of the destination: "+ dstIface.getProperty("inventoryId"));
 			//Creating the switch interface --> switch interface (LINK) relationship
 			Relationship link = srcIface.createRelationshipTo(dstIface, RelTypes.LINK);
 			
@@ -290,7 +274,6 @@ public class ControllerImp implements ControllerInterface {
 	//Implementation for SW-Control link
 	public void addInternalLink(Node interface1, Node interface2){
 		Relationship link = interface1.createRelationshipTo(interface2, RelTypes.LINK);
-		System.out.println("*** internal link: " + interface1.getProperty("inventoryId")+ "  " + interface2.getProperty("inventoryId"));
 		link.setProperty("id", (String) interface1.getProperty("inventoryId") + "-"+ (String) interface2.getProperty("inventoryId"));
 		
 		link.setProperty("status", true);
@@ -420,11 +403,8 @@ public class ControllerImp implements ControllerInterface {
 			//Looking for a interface switch of the src
 			Node swIface = null;
 			String swInterface = host.getSwId().get(0).toString() + ":0"; //Neo4j can't accept a list as property
-			System.out.println("****** Name of the switch interface build it: " + swInterface);
 			for (Path elementPathSw : elementsTraverserSw){
-				System.out.println("****** Name of the switch interfaces: " + elementPathSw.endNode().getProperty("inventoryId"));
 				if ( swInterface.equals(elementPathSw.endNode().getProperty("inventoryId").toString())){
-					System.out.println("****** Found the interface of switch to connect pc *******");
 					swIface = elementPathSw.endNode();
 					break;
 				}
@@ -444,13 +424,10 @@ public class ControllerImp implements ControllerInterface {
 	@Override
 	public void updateHost(Host host) {
 		// TODO Auto-generated method stub
-		System.out.println("Entro en updateHost");
 		setUp();
 		Transaction tx = graphDb.beginTx();
 		try{
-			System.out.println("List of new info host: dhcp, inventory, ip: " + host.getDhcpName() + " " + host.getHostId()+ " " + host.getIpv4().get(0));
 			Node saveHost = listIfaceDevices.get("inventoryId", host.getHostId()).getSingle();
-			System.out.println("List of old info: dhcp, inventory, ip" + saveHost.getProperty("DHCP") + " " + saveHost.getProperty("inventoryId")+ " " + saveHost.getProperty("IP"));
 			saveHost.setProperty("inventoryId", host.getHostId());
 			saveHost.setProperty("DHCP", host.getDhcpName());
 			saveHost.setProperty("VLAN", host.getVlan().get(0));
@@ -475,28 +452,20 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
-			System.out.println("**** Name of the host object: " + host.getHostId());
 			//Getting the host node
 			Node pc = listIfaceDevices.get("inventoryId", host.getHostId()).getSingle();
-			System.out.println("****** Name of the host node: " + pc.getProperty("inventoryId"));
 			//Getting inventoryId of the interface
 			String idIface = host.getHostId()+ ":0"; //Neo4j doen't accept passing a list as property
-			System.out.println("***** pc interface name: " + idIface);
 			//Getting the interface of the host node
 			Traverser elementsTraverserIfaces = getInterfaceSwitch(pc);
 			
 			for(Path elementIface: elementsTraverserIfaces){
-				System.out.println("*****Interfaces switches: " + elementIface.endNode().getProperty("inventoryId"));
 				if(idIface.equals(elementIface.endNode().getProperty("inventoryId"))){
-					System.out.println("******** Host interface found it " + elementIface.endNode().getProperty("inventoryId"));
 					Relationship pathLink = elementIface.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
-					System.out.println("**** Content of the pathLink: " + pathLink);
 					if (pathLink!=null){
 					//Deleting links
-					System.out.println("***** Deleting path link");
 					pathLink.delete();
 					//Deleting host --> interface host relationship
-					System.out.println("***** Deleteing path has");
 					elementIface.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
 					}
 					else elementIface.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
@@ -523,7 +492,6 @@ public class ControllerImp implements ControllerInterface {
 		deleteFileOrDirectory( new File(DB_PATH));
 		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
 		listIfaceDevices = graphDb.index().forNodes("inventoryId");
-		System.out.println("***** DENTRO DEL setUp:nombre del SDNnetwork"+ listIfaceDevices.get("inventoryId","SDNnetwork").getSingle());
 		root = getControllerNode();
 				
 	}
@@ -533,17 +501,6 @@ public class ControllerImp implements ControllerInterface {
 		graphDb.shutdown();
 	}
 	
-	private void registerShutdownHook(){
-		
-		Runtime.getRuntime().addShutdownHook(new Thread()
-		{
-			@Override
-			public void run()
-			{
-				graphDb.shutdown();
-			}
-		});
-	}
 	
 	private static void deleteFileOrDirectory( final File file){
 		
@@ -572,7 +529,6 @@ public class ControllerImp implements ControllerInterface {
 	private Node getControllerNode()
 	{
 		if (listIfaceDevices.get("inventoryId", "SDNnetwork").getSingle()==null){
-			System.out.println("*********** Creando el nodo network, controllador *********" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle());
 			Transaction tx = graphDb.beginTx();
 			
 			try
@@ -606,7 +562,6 @@ public class ControllerImp implements ControllerInterface {
 		}
 		
 		else{
-			System.out.println("************** Existe el controlador ****************" + listIfaceDevices.get("inventoryId","SDNcontroller").getSingle().getProperty("inventoryId"));
 			return listIfaceDevices.get("inventoryId", "SDNcontroller").getSingle();	
 		}
 			
@@ -635,7 +590,6 @@ public class ControllerImp implements ControllerInterface {
 			root.createRelationshipTo(controllerIface, RelTypes.HAS);
 			
 			//Creating LINK interface switch --> controllerIface relationship
-			System.out.println("******* switch iface: " + iface.getProperty("inventoryId") + "  controller iface: " + controllerIface.getProperty("inventoryId"));
 			iface.createRelationshipTo(controllerIface, RelTypes.LINK);
 			
 		}

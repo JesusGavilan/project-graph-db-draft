@@ -429,7 +429,7 @@ public class testing {
 		cmd22.setSource("LINK");
 		
 		SingletonNode singleton = SingletonNode.getInstance();
-		/*
+		
 		//Executing command add sw0
 		singleton.execCommand("Here comes ", cmd0);
 		System.out.println("Creando sw: " + cmd0.getSwitch().getInventoryId());
@@ -478,7 +478,7 @@ public class testing {
 		singleton.execCommand("here comes", cmd12);
 		
 		
-		
+		/*
 		//Executing command delete sw-0
 		singleton.execCommand("here comes", cmd13);
 		
@@ -509,10 +509,10 @@ public class testing {
 	
 		//Executing command update Host pc3
 		singleton.execCommand("Here comes", cmd21);
-		*/
+		
 		//Executing command update link 
 		singleton.execCommand("Here comes", cmd22);
-		
+		*/
 	}
 
 }
