@@ -30,7 +30,6 @@ public class SingletonNode {
 		Command command = jsonToCommand(cmd,comando);
 		
 		
-		
 		ControllerImp action = new ControllerImp();
 		switch(command.getEvent()){
 			case "ADD_SWITCH":
@@ -49,8 +48,8 @@ public class SingletonNode {
 			
 			case "UPDATE_SWITCH":
 				/***** TO-DO *********/
-				//jsonToSwitch(command.getObject(), command.getSwitch());
-				//action.updateHost(command.getHost());
+				Switch swmod= jsonToSwitch(command.getObject(), command.getSwitch());
+				action.updateSwitch(swmod);
 				break;
 			
 			case "ADD_HOST":
@@ -62,7 +61,8 @@ public class SingletonNode {
 			
 			case "UPDATE_HOST":
 				/******* TO-DO *****************/
-				//jsonToHost(command.getObject(), command.getHost());
+				Host hostmod = jsonToHost(command.getObject(), command.getHost());
+				action.updateHost(hostmod);
 				break;
 			
 			case "DELETE_HOST":
@@ -86,7 +86,8 @@ public class SingletonNode {
 				break;
 				
 			case "UPDATE_LINK":
-				jsonToLink(command.getObject(), command.getLink());
+				Link lnkmod = jsonToLink(command.getObject(), command.getLink());
+				action.updateLink(lnkmod);
 				break;
 		}
 		

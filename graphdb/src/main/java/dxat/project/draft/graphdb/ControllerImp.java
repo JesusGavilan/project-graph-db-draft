@@ -103,18 +103,62 @@ public class ControllerImp implements ControllerInterface {
 
 	@Override
 	public void updateSwitch(Switch sw) {
+		setUp();
 		Transaction tx = graphDb.beginTx();
 		try
 		{
+			String [] info = sw.getOfAddr().split(":");
+			String interfConfig = sw.getInventoryId()+":"+info[0];
+			
+			Traverser interfacesSw = getInterfaceSwitch(listIfaceDevices.get("inventoryId",sw.getInventoryId()).getSingle());
+			for(Path elementsIface: interfacesSw){
+				Node nodeIface = elementsIface.endNode();
+				for(Interface listIface: sw.getInterfaces().getInterfaces()){
+					if(listIface.getInventoryId().equals(nodeIface.getProperty("inventoryId"))){
+						
+						nodeIface.setProperty("inventoryId", listIface.getInventoryId());
+						nodeIface.setProperty("portId", listIface.getPortId());
+						nodeIface.setProperty("status", listIface.getStatus());
+						nodeIface.setProperty("enabled", listIface.getEnabled());
+						nodeIface.setProperty("mac", listIface.getMac());
+						nodeIface.setProperty("currentSpeed", listIface.getCurrentSpeed());//10/100/1000 Mbps
+						
+						if(interfConfig.equals(nodeIface.getProperty("inventoryId"))){
+							nodeIface.setProperty("ipConfig", info[0] );
+							nodeIface.setProperty("ip", info[1]); //NGTH
+							nodeIface.setProperty("portConfig", info[2]);
+								
+						}
+						break;
+					}
+				}
+				
+				
+			}
+			
+			Node saveSw = listIfaceDevices.get("inventoryId", sw.getInventoryId()).getSingle();
+			saveSw.setProperty("inventoryId", sw.getInventoryId());
+			saveSw.setProperty("portConfig",  info[0]);
+			saveSw.setProperty("ipConfig", info[1]);
+			saveSw.setProperty("portCom", info[2]);
+			saveSw.setProperty("hardware", sw.getHardware());
+			saveSw.setProperty("serialNumber", sw.getSerialNum());
+			saveSw.setProperty("ifaces", sw.getNports());
+			saveSw.setProperty("type",sw.getType());
+			saveSw.setProperty("software", sw.getSoftware());
+			saveSw.setProperty("manufacturer", sw.getManufacturer());
+			
+			tx.success();
 			
 		}
 		finally
 		{
 			tx.finish();
+			graphDb.shutdown();
 		}
 
 	}
-
+	
 	@Override
 	public void deleteSwitch(String swId) {
 		setUp();
@@ -261,8 +305,43 @@ public class ControllerImp implements ControllerInterface {
 	@Override
 	public void updateLink(Link lnk) {
 		// TODO Auto-generated method stub
-		
-
+		setUp();
+	
+		Transaction tx = graphDb.beginTx();
+		try
+		{
+			//Getting switches that affects the link
+			Node srcSwitch = listIfaceDevices.get("inventoryId", lnk.getSrcSwitch()).getSingle();
+				
+			//Getting the interfaces of the switches that affects the links
+			Traverser elementsTraverserSrc = getInterfaceSwitch(srcSwitch);
+			
+			//Building the interfaces id
+			String src = lnk.getSrcSwitch() + ":" + lnk.getSrcPort();
+			
+			//Looking for a interface switch of the src
+			for (Path elementPathSrc : elementsTraverserSrc){
+				if ( src.equals(elementPathSrc.endNode().getProperty("inventoryId"))){
+					Relationship pathLink = elementPathSrc.endNode().getSingleRelationship(RelTypes.LINK,Direction.BOTH);
+					if(pathLink!=null){
+						pathLink.setProperty("inventoryId",lnk.getInventoryId());
+						pathLink.setProperty("srcSwitch", lnk.getSrcSwitch());
+						pathLink.setProperty("srcPort", lnk.getSrcPort());
+						pathLink.setProperty("dstSwitch", lnk.getDstSwitch());
+						pathLink.setProperty("dstPort", lnk.getDstPort());
+						pathLink.setProperty("inventoryId", lnk.getInventoryId());
+						pathLink.setProperty("type", lnk.getType());
+					}
+					break;
+				}
+			}
+			tx.success();
+			
+		}
+		finally{
+			tx.finish();
+			graphDb.shutdown();
+		}
 	}
 
 	@Override
@@ -313,11 +392,12 @@ public class ControllerImp implements ControllerInterface {
 			
 			pc.setProperty("inventoryId", host.getHostId());
 			pc.setProperty("IP", host.getIpv4().get(0));
-			//pc.setProperty("MAC", host.getMac());
+			pc.setProperty("MAC", host.getMac());
 			pc.setProperty("DHCP", host.getDhcpName());
-			//pc.setProperty("PortId", host.getPortId());
+			pc.setProperty("PortId", host.getPortId().get(0));
 			pc.setProperty("SwitchId", host.getSwId().get(0));
 			pc.setProperty("VLAN", host.getVlan().get(0));
+			
 			//Added to index
 			listIfaceDevices.add(pc, "inventoryId", host.getHostId());
 			//Create host interface
@@ -364,7 +444,28 @@ public class ControllerImp implements ControllerInterface {
 	@Override
 	public void updateHost(Host host) {
 		// TODO Auto-generated method stub
+		System.out.println("Entro en updateHost");
+		setUp();
+		Transaction tx = graphDb.beginTx();
+		try{
+			System.out.println("List of new info host: dhcp, inventory, ip: " + host.getDhcpName() + " " + host.getHostId()+ " " + host.getIpv4().get(0));
+			Node saveHost = listIfaceDevices.get("inventoryId", host.getHostId()).getSingle();
+			System.out.println("List of old info: dhcp, inventory, ip" + saveHost.getProperty("DHCP") + " " + saveHost.getProperty("inventoryId")+ " " + saveHost.getProperty("IP"));
+			saveHost.setProperty("inventoryId", host.getHostId());
+			saveHost.setProperty("DHCP", host.getDhcpName());
+			saveHost.setProperty("VLAN", host.getVlan().get(0));
+			saveHost.setProperty("IP", host.getIpv4().get(0));
+			saveHost.setProperty("SwitchId", host.getSwId().get(0));
+			saveHost.setProperty("MAC", host.getMac());
+			saveHost.setProperty("PortId", host.getPortId().get(0));
 
+			tx.success();
+		}
+		
+		finally{
+			tx.finish();
+			graphDb.shutdown();
+		}
 	}
 
 	@Override
@@ -571,7 +672,5 @@ public class ControllerImp implements ControllerInterface {
 		td.traverse(element);
 		return td.traverse(element);
 	}
-	
-	
 
 }

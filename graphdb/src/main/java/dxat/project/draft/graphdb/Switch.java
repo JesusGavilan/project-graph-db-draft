@@ -4,7 +4,7 @@ public class Switch {
 	private InterfacesCollection interfaces;
 	private String inventoryId = ""; // SW-XXX (XXX is the identifier in
 										// Floodlight list)
-	private String ofAddr = ""; // idport(inventoryId interface):Ip address:port of the switch
+	private String ofAddr = ""; // portConfiguration:Ip address:portComunication
 								// (configuration interface)
 	private int nports = 0; // Number of ports
 	private String type = ""; // Role in floodlight

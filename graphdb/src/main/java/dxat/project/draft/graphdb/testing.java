@@ -13,6 +13,7 @@ public class testing {
 		InterfacesCollection ifaceCollection1 = new InterfacesCollection();
 		InterfacesCollection ifaceCollection2 = new InterfacesCollection();
 		InterfacesCollection ifaceCollection3 = new InterfacesCollection();
+		InterfacesCollection ifaceCollectionMod = new InterfacesCollection();
 
 		//Populating a iface collection for sw0
 		for (int i=0;i<5;i++){
@@ -77,10 +78,30 @@ public class testing {
 			sw.setType("");
 			swCollection.addDevice(sw);
 		}
-		System.out.println("Posicion 0 de collection sw: " + swCollection.getDevices().get(0).getInventoryId());
-		System.out.println("Posicion 1 de collection sw: " + swCollection.getDevices().get(1).getInventoryId());
-		System.out.println("Posicion 2 de collection sw: " + swCollection.getDevices().get(2).getInventoryId());
-		System.out.println("Posicion 3 de collection sw: " + swCollection.getDevices().get(3).getInventoryId());
+		
+		//Creating interfaces to modify
+		//Populating a iface collection for sw0
+		for (int i=0;i<5;i++){
+			Interface iface_mod = new Interface();
+			iface_mod.setInventoryId("SW-2:" + i);
+			iface_mod.setMac("66:66:66:66:66:0"+ i);
+			iface_mod.setPortId(i);
+			iface_mod.setCurrentSpeed(666);
+			iface_mod.setEnabled(true);
+			ifaceCollectionMod.addInterface(iface_mod);
+		}
+		//Creating SW to modify
+		Switch sw_mod = new Switch();
+		sw_mod.setInventoryId("SW-2");
+		sw_mod.setInterfaces(ifaceCollectionMod);
+		sw_mod.setHardware("Microtik");
+		sw_mod.setManufacturer("RouterBOARD 750GL");
+		sw_mod.setDatapath("");
+		sw_mod.setNports(5);
+		sw_mod.setOfAddr("0:192.168.1.69:125");
+		sw_mod.setSerialNum("666");
+		sw_mod.setSoftware("mikrotik os");
+		sw_mod.setType("");
 		
 		//Creating a host instances
 		//Host 0 parameters
@@ -129,6 +150,17 @@ public class testing {
         swId3.add("SW-3");      
         portId3.add(3); 
 		
+        //Host mod parameters
+        List<String> ipmod = new ArrayList<String>();
+        List<Short> vlanmod = new ArrayList<Short>();
+        List<String> swIdmod = new ArrayList<String>();
+        List<Integer> portIdmod = new ArrayList<Integer>();
+
+        ipmod.add("88.88.88.88");
+        vlanmod.add((short)1);           
+        swIdmod.add("SW-3");      
+        portIdmod.add(3); 
+        
 		//Host0 instance	
 		Host pc0 = new Host();
 		pc0.setHostId("PC-0");
@@ -169,6 +201,16 @@ public class testing {
         pc3.setVlan(vlan3);
         pc3.setSwId(swId3);
         pc3.setPortId(portId3);
+        
+        //Hostmod instance
+        Host pcmod = new Host();
+        pcmod.setHostId("PC-3");
+        pcmod.setDhcpName("77.77.77.77");
+        pcmod.setMac("84:2b:2b:6699:7f:40");
+        pcmod.setIpv4(ipmod);
+        pcmod.setVlan(vlanmod);
+        pcmod.setSwId(swIdmod);
+        pcmod.setPortId(portIdmod);       
 
 	
 		//Creating a LINK instances
@@ -216,6 +258,16 @@ public class testing {
 		lnk5.setDstPort(2);
 		lnk5.setInventoryId("SW-2:4_SW-3:2");
 		lnk5.setType("");
+		
+		//Creating LINK MOD sw-1 sw2
+		Link lnkmod = new Link();
+		lnkmod.setSrcSwitch("SW-1");
+		lnkmod.setSrcPort(4);
+		lnkmod.setDstSwitch("SW-2");
+		lnkmod.setDstPort(2);
+		lnkmod.setInventoryId("SW-1:4_SW-2:2");
+		lnkmod.setType("check");
+		
 		
 		//Creating command --> add sw0
 		Command cmd0 = new Command();
@@ -355,6 +407,27 @@ public class testing {
 		cmd19.setHost(pc2);
 		cmd19.setSource("HOST");
 		
+		//Creating command --> update SW-2
+		Command cmd20 = new Command();
+		cmd20.setEvent("UPDATE_SWITCH");
+		cmd20.setObject("Here comes objecto serialized");
+		cmd20.setSwitch(sw_mod);
+		cmd20.setSource("SWITCH");
+		
+		//Creating command --> update Host PC3
+		Command cmd21 = new Command();
+		cmd21.setEvent("UPDATE_HOST");
+		cmd21.setObject("Here comes objecto serialized");
+		cmd21.setHost(pcmod);
+		cmd21.setSource("HOST");
+		
+		//Creating command --> update Link
+		Command cmd22 = new Command();
+		cmd22.setEvent("UPDATE_LINK");
+		cmd22.setObject("Here comes object serialized");
+		cmd22.setLink(lnkmod);
+		cmd22.setSource("LINK");
+		
 		SingletonNode singleton = SingletonNode.getInstance();
 		/*
 		//Executing command add sw0
@@ -403,8 +476,9 @@ public class testing {
 		
 		//Executing command add host pc3
 		singleton.execCommand("here comes", cmd12);
-		*/
-		/*
+		
+		
+		
 		//Executing command delete sw-0
 		singleton.execCommand("here comes", cmd13);
 		
@@ -417,20 +491,27 @@ public class testing {
 		//Executing command add sw0 again
 		singleton.execCommand("Here comes ", cmd0);
 		
-		*/
+		
 		//Executing command delete link sw-1_sw-3
-		//singleton.execCommand("Here comes", cmd16);
+		singleton.execCommand("Here comes", cmd16);
 		
 		//Executing command delete link sw-0_sw-2
-		//singleton.execCommand("Here comes", cmd17);
+		singleton.execCommand("Here comes", cmd17);
 		
 		//Executing command delete host pc-1
-		singleton.execCommand("Here comes", cmd18);
+		//singleton.execCommand("Here comes", cmd18);
 		
 		//Executing command delete host pc-2
 		singleton.execCommand("Here comes", cmd19);
-		
-		
+	
+		//Executing command update SW-2
+		singleton.execCommand("Here comes", cmd20);
+	
+		//Executing command update Host pc3
+		singleton.execCommand("Here comes", cmd21);
+		*/
+		//Executing command update link 
+		singleton.execCommand("Here comes", cmd22);
 		
 	}
 
