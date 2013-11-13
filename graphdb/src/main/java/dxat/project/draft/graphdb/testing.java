@@ -341,6 +341,19 @@ public class testing {
 		cmd17.setLink(lnk2);
 		cmd17.setSource("LINK");
 		
+		//Creating command --> delete HOST pc1
+		Command cmd18 = new Command();
+		cmd18.setEvent("DELETE_HOST");
+		cmd18.setObject("Here comes object serialized");
+		cmd18.setHost(pc1);
+		cmd18.setSource("HOST");
+
+		//Creating command --> delete HOST pc1
+		Command cmd19 = new Command();
+		cmd19.setEvent("DELETE_HOST");
+		cmd19.setObject("Here comes object serialized");
+		cmd19.setHost(pc2);
+		cmd19.setSource("HOST");
 		
 		SingletonNode singleton = SingletonNode.getInstance();
 		/*
@@ -390,7 +403,8 @@ public class testing {
 		
 		//Executing command add host pc3
 		singleton.execCommand("here comes", cmd12);
-		
+		*/
+		/*
 		//Executing command delete sw-0
 		singleton.execCommand("here comes", cmd13);
 		
@@ -402,13 +416,21 @@ public class testing {
 		
 		//Executing command add sw0 again
 		singleton.execCommand("Here comes ", cmd0);
-		*/
 		
+		*/
 		//Executing command delete link sw-1_sw-3
-		singleton.execCommand("Here comes", cmd16);
+		//singleton.execCommand("Here comes", cmd16);
 		
 		//Executing command delete link sw-0_sw-2
-		singleton.execCommand("Here comes", cmd17);
+		//singleton.execCommand("Here comes", cmd17);
+		
+		//Executing command delete host pc-1
+		singleton.execCommand("Here comes", cmd18);
+		
+		//Executing command delete host pc-2
+		singleton.execCommand("Here comes", cmd19);
+		
+		
 		
 	}
 

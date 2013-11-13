@@ -276,6 +276,7 @@ public class ControllerImp implements ControllerInterface {
 			//Getting the parameters
 			String src = lnk.getSrcSwitch() + ":" + lnk.getSrcPort();
 			
+			
 			//Getting Switch nodes that affects links
 			Node srcSwitch = listIfaceDevices.get("inventoryId", lnk.getSrcSwitch()).getSingle();
 			
@@ -322,7 +323,7 @@ public class ControllerImp implements ControllerInterface {
 			//Create host interface
 			
 			Node iface = graphDb.createNode();
-			iface.setProperty("inventoryId", host.getHostId() + ":" + host.getPortId().get(0)); //SW-XX:PORT
+			iface.setProperty("inventoryId", host.getHostId() + ":0"); //SW-XX:PORT. Neo4j can't acccept a list as a property
 			iface.setProperty("portId", host.getPortId().get(0));
 			iface.setProperty("status",  false);
 			iface.setProperty("enabled", false);
@@ -338,7 +339,7 @@ public class ControllerImp implements ControllerInterface {
 			
 			//Looking for a interface switch of the src
 			Node swIface = null;
-			String swInterface = host.getSwId().get(0).toString() + ":" + host.getPortId().get(0).toString();
+			String swInterface = host.getSwId().get(0).toString() + ":0"; //Neo4j can't accept a list as property
 			System.out.println("****** Name of the switch interface build it: " + swInterface);
 			for (Path elementPathSw : elementsTraverserSw){
 				System.out.println("****** Name of the switch interfaces: " + elementPathSw.endNode().getProperty("inventoryId"));
@@ -373,21 +374,31 @@ public class ControllerImp implements ControllerInterface {
 		Transaction tx = graphDb.beginTx();
 		try
 		{
+			System.out.println("**** Name of the host object: " + host.getHostId());
 			//Getting the host node
 			Node pc = listIfaceDevices.get("inventoryId", host.getHostId()).getSingle();
-			
+			System.out.println("****** Name of the host node: " + pc.getProperty("inventoryId"));
 			//Getting inventoryId of the interface
-			String idIface = host.getSwId() + ":" + host.getPortId();
-			
+			String idIface = host.getHostId()+ ":0"; //Neo4j doen't accept passing a list as property
+			System.out.println("***** pc interface name: " + idIface);
 			//Getting the interface of the host node
 			Traverser elementsTraverserIfaces = getInterfaceSwitch(pc);
 			
 			for(Path elementIface: elementsTraverserIfaces){
-				if(elementIface.endNode().getProperty("inventoryId")==idIface){
+				System.out.println("*****Interfaces switches: " + elementIface.endNode().getProperty("inventoryId"));
+				if(idIface.equals(elementIface.endNode().getProperty("inventoryId"))){
+					System.out.println("******** Host interface found it " + elementIface.endNode().getProperty("inventoryId"));
+					Relationship pathLink = elementIface.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
+					System.out.println("**** Content of the pathLink: " + pathLink);
+					if (pathLink!=null){
 					//Deleting links
-					elementIface.endNode().getSingleRelationship(RelTypes.LINK, Direction.BOTH);
+					System.out.println("***** Deleting path link");
+					pathLink.delete();
 					//Deleting host --> interface host relationship
+					System.out.println("***** Deleteing path has");
 					elementIface.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
+					}
+					else elementIface.endNode().getSingleRelationship(RelTypes.HAS, Direction.BOTH).delete();
 					//Deleting interface host
 					elementIface.endNode().delete();
 				}
@@ -397,10 +408,11 @@ public class ControllerImp implements ControllerInterface {
 			//Removing host
 			pc.delete();
 			
-			
+			tx.success();
 		}
 		finally{
 			tx.finish();
+			graphDb.shutdown();
 		}
 		
 	}
